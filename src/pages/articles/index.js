@@ -1,18 +1,28 @@
-// src/pages/articles/index.js
-import Link from 'next/link';
+// In src/pages/articles/index.js
+
+import Layout from '../../app/layout';
 
 export default function Articles({ articles }) {
+    // Handle case where articles is undefined or empty
+    if (!articles || articles.length === 0) {
+        return (
+            <Layout>
+                <h1>Articles</h1>
+                <p>No articles available.</p>
+            </Layout>
+        );
+    }
+
     return (
-        <div>
+        <Layout>
             <h1>Articles</h1>
             {articles.map(article => (
                 <div key={article.id}>
                     <h2>{article.title}</h2>
                     <p>{article.body}</p>
-                    {/* Add more fields as needed */}
                 </div>
             ))}
-        </div>
+        </Layout>
     );
 }
 
@@ -21,7 +31,6 @@ export async function getServerSideProps() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/articles`);
         const { data } = await res.json();
 
-        // Transform the data to get the attributes out of each article
         const articles = data.map(item => ({
             id: item.id,
             ...item.attributes
@@ -30,7 +39,7 @@ export async function getServerSideProps() {
         return { props: { articles } };
     } catch (error) {
         console.error('Error fetching articles:', error);
+        // Return an empty array if there's an error or data is not available
         return { props: { articles: [] } };
     }
 }
-
