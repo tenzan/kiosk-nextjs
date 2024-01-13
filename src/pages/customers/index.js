@@ -1,11 +1,11 @@
 // src/pages/customers/index.js
 import Layout from '../../app/layout';
+import { isAuthenticated } from '../../../utils/auth';
 
-export default function Customers({customers}) {
-    // Handle case where customers is undefined or empty
+export default function Customers({ customers, isUserAuthenticated }) {
     if (!customers || customers.length === 0) {
         return (
-            <Layout>
+            <Layout isUserAuthenticated={isUserAuthenticated}>
                 <h1>Customers</h1>
                 <p>No customers available.</p>
             </Layout>
@@ -13,8 +13,8 @@ export default function Customers({customers}) {
     }
 
     return (
-        <Layout>
-            <h1>Articles</h1>
+        <Layout isUserAuthenticated={isAuthenticated}>
+            <h1>Customers</h1>
             {customers.map(customer => (
                 <div key={customer.id}>
                     <h2>{customer.name}</h2>
@@ -25,16 +25,26 @@ export default function Customers({customers}) {
 }
 
 export async function getServerSideProps(context) {
-    try {
-        const token = context.req.cookies['jwt'];
+    const token = context.req.cookies['jwt'];
+    const isUserAuthenticated = !!token;
 
-        // Include the token in your request to the Strapi API
+    if (!isUserAuthenticated) {
+        return {
+            redirect: {
+                destination: '/login',
+                permanent: false,
+            },
+        };
+    }
+
+    try {
         const apiUrl = `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/customers`;
         const res = await fetch(apiUrl, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
+
         const json = await res.json();
 
         if (!json.data || !Array.isArray(json.data)) {
@@ -46,9 +56,9 @@ export async function getServerSideProps(context) {
             ...item.attributes
         }));
 
-        return {props: {customers}};
+        return { props: { customers, isUserAuthenticated } };
     } catch (error) {
         console.error('Error fetching customers:', error);
-        return {props: {customers: []}};
+        return { props: { customers: [], isUserAuthenticated } };
     }
 }
