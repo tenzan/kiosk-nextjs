@@ -1,6 +1,7 @@
 // pages/login.js
 import { useState } from 'react';
 import Router from 'next/router';
+import Cookies from 'js-cookie';
 
 export default function Login() {
     const [identifier, setIdentifier] = useState('');
@@ -27,7 +28,9 @@ export default function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                // Set the token in cookies or local storage as per your requirement
+                // Store the JWT token in a cookie
+                Cookies.set('jwt', data.jwt, { expires: 7 }); // Expires in 7 days, for example
+
                 // Redirect to the homepage or dashboard page
                 Router.push('/');
             } else {

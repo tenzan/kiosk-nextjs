@@ -1,7 +1,7 @@
 // src/pages/customers/index.js
 import Layout from '../../app/layout';
 
-export default function Customers({ customers }) {
+export default function Customers({customers}) {
     // Handle case where customers is undefined or empty
     if (!customers || customers.length === 0) {
         return (
@@ -26,7 +26,7 @@ export default function Customers({ customers }) {
 
 export async function getServerSideProps(context) {
     try {
-        const token = context.req.cookies['your-auth-token-cookie-name'];
+        const token = context.req.cookies['jwt'];
 
         // Include the token in your request to the Strapi API
         const apiUrl = `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/customers`;
@@ -46,9 +46,9 @@ export async function getServerSideProps(context) {
             ...item.attributes
         }));
 
-        return { props: { customers } };
+        return {props: {customers}};
     } catch (error) {
         console.error('Error fetching customers:', error);
-        return { props: { customers: [] } };
+        return {props: {customers: []}};
     }
 }
