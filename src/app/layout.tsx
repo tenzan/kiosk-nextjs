@@ -27,7 +27,7 @@ const Layout = ({ children, isUserAuthenticated }: LayoutProps) => {
                     </div>
                     <div>
                         {isUserAuthenticated ? (
-                            <a href="/logout" className="hover:text-gray-300 cursor-pointer">Logout</a>
+                            <a href="/api/logout" className="hover:text-gray-300 cursor-pointer">Logout</a>
                         ) : (
                             <Link href="/login" passHref>
                                 <span className="hover:text-gray-300 cursor-pointer">Login</span>
